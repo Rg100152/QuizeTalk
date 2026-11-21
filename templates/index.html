@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}Home Hub · QuizeTalk{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div class="hero__content">
+    <span class="hero__eyebrow">⚡ Live · Custom · Social</span>
+    <h1>Create, Play &amp; <span>Talk</span> Quizzes</h1>
+    <p>Turn any idea into a colourful quiz in minutes. Challenge your friends, beat the clock, then share your best tricks in the QuizeTalk Corner.</p>
+    <div class="hero__actions">
+      <a class="btn btn--primary btn--lg" href="{{ url_for('main.create') }}">＋ Create New Quiz</a>
+      <a class="btn btn--ghost btn--lg" href="#quiz-grid">Explore quizzes ↓</a>
+    </div>
+  </div>
+  <div class="hero__art" aria-hidden="true">
+    <div class="float-card float-card--a">
+      <span class="float-card__badge">Q1</span>
+      <span class="float-card__line"></span>
+      <span class="float-card__line float-card__line--short"></span>
+      <span class="float-card__chip float-card__chip--ok">✓ Correct!</span>
+    </div>
+    <div class="float-card float-card--b">
+      <span class="float-card__badge float-card__badge--pink">★</span>
+      <strong>Level up!</strong>
+      <span class="float-card__line float-card__line--tiny"></span>
+    </div>
+    <div class="float-card float-card--c">
+      <span class="float-card__avatar">🙋</span>
+      <div>
+        <span class="float-card__line float-card__line--tiny"></span>
+        <span class="float-card__line float-card__line--short"></span>
+      </div>
+    </div>
+    <div class="hero__spark hero__spark--one">✦</div>
+    <div class="hero__spark hero__spark--two">✦</div>
+  </div>
+</section>
+
+<section class="stats-strip" aria-label="QuizeTalk in numbers">
+  <div class="stat"><span class="stat__value">{{ totals.quizzes }}</span><span class="stat__label">Quizzes ready</span></div>
+  <div class="stat"><span class="stat__value">{{ totals.questions }}</span><span class="stat__label">Questions to beat</span></div>
+  <div class="stat"><span class="stat__value">{{ totals.plays }}</span><span class="stat__label">Rounds played</span></div>
+  <div class="stat"><span class="stat__value">{{ totals.talks }}</span><span class="stat__label">Tips shared</span></div>
+</section>
+
+{% set icons = {'Coding': '💻', 'Science': '🔬', 'General': '🌍'} %}
+{% set accents = {'Coding': '#0EA5E9', 'Science': '#10B981', 'General': '#F59E0B'} %}
+
+<section class="catalog">
+  <div class="section-heading">
+    <div>
+      <span class="eyebrow">🎯 Pick your challenge</span>
+      <h2>Explore the quiz library</h2>
+      <p>Every quiz comes with a discussion board — the fun continues after the scorecard.</p>
+    </div>
+  </div>
+
+  <div class="category-tabs" role="tablist" aria-label="Quiz categories">
+    <a class="tab {% if active_category == 'All' %}tab--active{% endif %}" href="{{ url_for('main.home') }}" role="tab" aria-selected="{{ 'true' if active_category == 'All' else 'false' }}">✨ All</a>
+    {% for category in categories %}
+    <a class="tab {% if active_category == category %}tab--active{% endif %}"
+       href="{{ url_for('main.home', category=category) }}"
+       role="tab" aria-selected="{{ 'true' if active_category == category else 'false' }}">
+      {{ icons.get(category, '🎯') }} {{ category }}
+    </a>
+    {% endfor %}
+  </div>
+
+  <div class="quiz-grid" id="quiz-grid">
+    {% for quiz in quizzes %}
+    <article class="quiz-card" style="--card-accent: {{ accents.get(quiz.category, '#8B5CF6') }}">
+      <div class="quiz-card__top">
+        <span class="pill pill--violet">{{ quiz.category }}</span>
+        <span class="quiz-card__emoji" aria-hidden="true">{{ icons.get(quiz.category, '🎯') }}</span>
+      </div>
+      <h3 class="quiz-card__title">{{ quiz.title }}</h3>
+      <p class="quiz-card__desc">{{ quiz.description or 'A fresh challenge waiting for you.' }}</p>
+      <div class="quiz-card__meta">
+        <span class="meta-item">🧠 {{ quiz.question_count }} questions</span>
+        <span class="meta-item">⏱️ {{ quiz.time_per_question }}s each</span>
+        <span class="meta-item">👥 {{ quiz.player_count }} played</span>
+        <span class="meta-item">💬 {{ quiz.talk_count }} tips</span>
+      </div>
+      <div class="quiz-card__footer">
+        <a class="btn btn--primary btn--block" href="{{ url_for('main.play', quiz_id=quiz.id) }}">Play Now ▶</a>
+      </div>
+    </article>
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-state__emoji">🪄</div>
+      <h3>No quizzes here yet</h3>
+      <p>Be the first to build one in this category.</p>
+      <a class="btn btn--primary" href="{{ url_for('main.create') }}">Create the first quiz</a>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+{% block title %}{{ quiz.title }} · Live Quiz · QuizeTalk{% endblock %}
+
+{% block content %}
+<div class="play-wrap">
+  <!-- ============ LIVE ARENA ============ -->
+  <section id="arena" class="arena" aria-label="Live quiz arena">
+    <div class="arena__top">
+      <div class="arena__meta">
+        <span class="pill pill--violet">{{ quiz.category }} · ⏱️ {{ quiz.time_per_question }}s</span>
+        <h1 class="arena__title">{{ quiz.title }}</h1>
+      </div>
+      <label class="name-field">
+        <span>Your name</span>
+        <input id="player-name" class="input" type="text" maxlength="40" value="Player" autocomplete="nickname">
+      </label>
+    </div>
+
+    <div class="progress-wrap">
+      <div class="progress-info">
+        <span id="progress-label">Question 1 of {{ questions | length }}</span>
+        <span id="progress-percent">0%</span>
+      </div>
+      <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progress-track">
+        <div class="progress-bar" id="progress-bar"></div>
+      </div>
+    </div>
+
+    <div class="stage-grid">
+      <div class="timer-wrap" aria-label="Countdown timer">
+        <svg class="timer-ring" viewBox="0 0 120 120" aria-hidden="true">
+          <circle class="timer-ring__track" cx="60" cy="60" r="52"></circle>
+          <circle class="timer-ring__progress" id="timer-progress" cx="60" cy="60" r="52"></circle>
+        </svg>
+        <div class="timer-wrap__center">
+          <span id="timer-value">{{ quiz.time_per_question }}</span>
+          <small>sec</small>
+        </div>
+      </div>
+
+      <div class="question-stage">
+        <span class="question-stage__label">QUESTION <span id="question-number">1</span></span>
+        <h2 class="question-stage__text" id="question-text">Get ready…</h2>
+        <div class="explanation" id="explanation" hidden></div>
+        <button class="btn btn--primary next-btn" id="next-btn" type="button" hidden>Next question →</button>
+      </div>
+    </div>
+
+    <div class="options-grid options-grid--play" id="options-grid">
+      <button class="option-tile" data-letter="A" type="button">
+        <span class="option-tile__badge">A</span><span class="option-tile__text"></span><span class="option-tile__check">✓</span>
+      </button>
+      <button class="option-tile" data-letter="B" type="button">
+        <span class="option-tile__badge">B</span><span class="option-tile__text"></span><span class="option-tile__check">✓</span>
+      </button>
+      <button class="option-tile" data-letter="C" type="button">
+        <span class="option-tile__badge">C</span><span class="option-tile__text"></span><span class="option-tile__check">✓</span>
+      </button>
+      <button class="option-tile" data-letter="D" type="button">
+        <span class="option-tile__badge">D</span><span class="option-tile__text"></span><span class="option-tile__check">✓</span>
+      </button>
+    </div>
+
+    <div class="arena__footer">
+      <span class="keyboard-hint">⌨️ Press <kbd>A</kbd> <kbd>B</kbd> <kbd>C</kbd> <kbd>D</kbd> to answer · <kbd>Enter</kbd> for next</span>
+      <button class="btn btn--icon" id="sound-toggle" type="button" title="Toggle sound" aria-label="Toggle sound">🔊</button>
+    </div>
+  </section>
+
+  <!-- ============ SCORECARD + DISCUSSION ============ -->
+  <section id="result" class="result" hidden>
+    <div class="result-card">
+      <div class="result-card__head">
+        <span class="eyebrow">🏆 Quiz complete</span>
+        <span class="pill pill--violet">{{ quiz.title }}</span>
+      </div>
+
+      <div class="score-hero">
+        <div class="score-ring">
+          <svg class="score-ring__svg" viewBox="0 0 130 130" aria-hidden="true">
+            <circle class="score-ring__track" cx="65" cy="65" r="54"></circle>
+            <circle class="score-ring__progress" id="score-progress" cx="65" cy="65" r="54"></circle>
+          </svg>
+          <div class="score-ring__label">
+            <strong id="score-value">0/0</strong>
+            <span id="accuracy-value">0%</span>
+          </div>
+        </div>
+        <div class="score-hero__copy">
+          <h2 id="result-title">Nice work!</h2>
+          <p id="result-message">Let's see how you did.</p>
+          <div class="result-actions">
+            <button class="btn btn--primary" id="share-btn" type="button">🔗 Copy share link</button>
+            <a class="btn btn--ghost" href="{{ url_for('main.home') }}">More quizzes</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="breakdown">
+        <h3>📋 Answer breakdown</h3>
+        <div id="breakdown-list" class="breakdown__list"></div>
+      </div>
+    </div>
+
+    <div class="talk-panel" id="talk-corner">
+      <div class="talk-panel__head">
+        <div>
+          <span class="eyebrow">💬 QuizeTalk Corner</span>
+          <h2>Share a tip, start a chat</h2>
+          <p>Tell everyone how you did and the trick that helped you.</p>
+        </div>
+        <span class="pill pill--violet" id="talk-count">{{ talk_count }} posts</span>
+      </div>
+
+      <form id="talk-form" class="talk-form">
+        <div class="talk-form__row">
+          <input class="input" id="talk-name" type="text" maxlength="40" placeholder="Your name" aria-label="Your name">
+          <input class="input" id="talk-score" type="text" maxlength="20" placeholder="Score e.g. 4/5" aria-label="Your score">
+        </div>
+        <textarea class="input textarea" id="talk-message" rows="3" maxlength="500"
+                  placeholder="Your tip or comment..." aria-label="Your tip or comment"></textarea>
+        <div class="talk-form__footer">
+          <span class="form-message" id="talk-message-status" role="status" hidden></span>
+          <button class="btn btn--primary" type="submit">Post comment 💬</button>
+        </div>
+      </form>
+
+      <div id="talk-list" class="talk-list" aria-live="polite"></div>
+    </div>
+  </section>
+</div>
+
+<canvas id="confetti-canvas" aria-hidden="true"></canvas>
+
+<script>
+  window.QUIZ = {{ quiz | tojson }};
+  window.QUESTIONS = {{ questions | tojson }};
+  window.QUIZ_ID = {{ quiz.id }};
+</script>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/player.js') }}" defer></script>
+{% endblock %}

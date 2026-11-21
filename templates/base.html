@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="QuizeTalk — create custom quizzes, play them live, and talk about what you learned.">
+  <title>{% block title %}QuizeTalk{% endblock %}</title>
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='assets/logo-quizetalk.svg') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/quizetalk.css') }}">
+</head>
+<body>
+  <div class="bg-orbs" aria-hidden="true">
+    <span class="bg-orb bg-orb--one"></span>
+    <span class="bg-orb bg-orb--two"></span>
+    <span class="bg-orb bg-orb--three"></span>
+  </div>
+
+  <header class="site-nav">
+    <div class="nav-inner">
+      <a class="brand" href="{{ url_for('main.home') }}" aria-label="QuizeTalk home">
+        <img src="{{ url_for('static', filename='assets/logo-quizetalk.svg') }}" alt="QuizeTalk" width="180" height="40">
+      </a>
+      <nav class="nav-links" aria-label="Main navigation">
+        <a class="nav-link {% if request.endpoint == 'main.home' %}is-active{% endif %}" href="{{ url_for('main.home') }}">Home</a>
+        <a class="nav-link {% if request.endpoint == 'main.create' %}is-active{% endif %}" href="{{ url_for('main.create') }}">Studio</a>
+        <a class="btn btn--primary btn--small" href="{{ url_for('main.create') }}">＋ Create Quiz</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page-shell">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <div class="site-footer__inner">
+      <span>💜 QuizeTalk — learn, play, discuss.</span>
+      <span>Built with Flask + a little bit of magic.</span>
+    </div>
+  </footer>
+
+  {% block scripts %}{% endblock %}
+</body>
+</html>
